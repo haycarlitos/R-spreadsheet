@@ -14,7 +14,7 @@ create_spreadsheet <- function(rows, columns) {
 # Initialize the spreadsheet
 spreadsheet <- reactiveVal(create_spreadsheet(1000, 26)) # 26 columns for A to Z
 
-# Function to update cell value with formula handling and error handling
+# Function to update cell value with formula handling, error handling, and type consistency
 update_cell <- function(spreadsheet, row, column, value) {
   col_name <- LETTERS[column]
   updated_spreadsheet <- spreadsheet()
@@ -30,17 +30,13 @@ update_cell <- function(spreadsheet, row, column, value) {
       # Return the original expression if an error occurs
       paste("Error: Invalid formula", expr)
     })
-  } else {
-    # If the value does not start with '=', treat it as a string
-    # Convert to numeric if it is a valid number
-    if (suppressWarnings(!is.na(as.numeric(value)))) {
-      value <- as.numeric(value)
-    }
   }
   
-  updated_spreadsheet[row, col_name] <- value
+  # Convert all values to character to maintain type consistency in the spreadsheet
+  updated_spreadsheet[row, col_name] <- as.character(value)
   spreadsheet(updated_spreadsheet)
 }
+
 
 
 # Shiny UI
@@ -98,6 +94,7 @@ server <- function(input, output, session) {
 <h3>The <code>update_cell</code> Function</h3>
 <pre><code>
 # Function to update cell value with formula handling and error handling
+# Function to update cell value with formula handling, error handling, and type consistency
 update_cell <- function(spreadsheet, row, column, value) {
   col_name <- LETTERS[column]
   updated_spreadsheet <- spreadsheet()
@@ -113,15 +110,10 @@ update_cell <- function(spreadsheet, row, column, value) {
       # Return the original expression if an error occurs
       paste('Error: Invalid formula', expr)
     })
-  } else {
-    # If the value does not start with '=', treat it as a string
-    # Convert to numeric if it is a valid number
-    if (suppressWarnings(!is.na(as.numeric(value)))) {
-      value <- as.numeric(value)
-    }
   }
-  
-  updated_spreadsheet[row, col_name] <- value
+
+  # Convert all values to character to maintain type consistency in the spreadsheet
+  updated_spreadsheet[row, col_name] <- as.character(value)
   spreadsheet(updated_spreadsheet)
 }
 </code></pre>
